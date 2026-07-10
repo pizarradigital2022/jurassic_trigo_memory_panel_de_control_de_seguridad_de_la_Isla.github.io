@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurassic Trigo-Memory V6</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <style>
+        :root {
+            --jurassic-dark: #111a12;
+            --jurassic-green: #1d351e;
+            --jurassic-gold: #f39c12;
+            --jurassic-accent: #962d2d;
+            --light-text: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--jurassic-dark);
+            color: var(--light-text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        /* Contenedor adaptativo de imágenes */
+        .image-container {
+            width: 100%;
+            margin: 10px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed var(--jurassic-gold);
+            border-radius: 8px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .image-placeholder {
+            font-style: italic;
+            color: #888;
+            padding: 15px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        /* Estilos de Contenedores y Pantallas */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(29, 53, 30, 0.93);
+            border: 3px solid var(--jurassic-gold);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.8);
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h1, h2, h3 {
+            color: var(--jurassic-gold);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        /* Formularios y Botones */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #add8e6;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--jurassic-gold);
+            background: #000;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+
+        select option {
+            background: #111;
+            color: #fff;
+        }
+
+        button {
+            background-color: var(--jurassic-accent);
+            color: white;
+            border: 2px solid var(--jurassic-gold);
+            padding: 12px 24px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: var(--jurassic-gold);
+            color: black;
+            box-shadow: 0 0 10px var(--jurassic-gold);
+        }
+
+        .rules-box {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-left: 5px solid var(--jurassic-accent);
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .team-input-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* ================= CONSOLA SUPERIOR DE ACCESO ================= */
+        .console-top-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--jurassic-gold);
+            margin-bottom: 25px;
+        }
+
+        .console-row-hud {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .hud-panel {
+            background: rgba(20, 20, 20, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .hud-title-lbl {
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            color: #add8e6;
+            text-transform: uppercase;
+        }
+
+        .hud-time {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ff4d4d;
+            font-family: monospace;
+            margin-top: 3px;
+        }
+
+        .turn-banner {
+            background: #000;
+            border: 3px dashed var(--jurassic-gold);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: var(--jurassic-gold); box-shadow: 0 0 5px rgba(243, 156, 18, 0.4); }
+            50% { border-color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.7); }
+            100% { border-color: var(--jurassic-gold); box-shadow: 0 0 5px rgba(243, 156, 18, 0.4); }
+        }
+
+        .active-team-name {
+            display: block;
+            font-size: 1.6em;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-shadow: 0 0 8px currentColor;
+        }
+
+        .teams-status-horizontal {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+            justify-content: center;
+        }
+
+        .team-badge {
+            flex: 1;
+            max-width: 180px;
+            min-width: 130px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+            background: #222;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+
+        .team-badge.active-turn {
+            border-color: #fff;
+            box-shadow: 0 0 12px #fff;
+            transform: scale(1.04);
+            opacity: 1;
+        }
+
+        /* ================= REJILLA PERFECTA: 7 COLUMNAS X 6 FILAS (42 CELDAS) ================= */
+        .memory-grid-7x6 {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 95px);
+            gap: 12px;
+            width: 100%;
+        }
+
+        .card {
+            perspective: 1000px;
+            cursor: pointer;
+            height: 100%;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.4s;
+            transform-style: preserve-3d;
+            border-radius: 6px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .card-back {
+            background: radial-gradient(circle, #3a2212 20%, #110b06 100%);
+            border: 2px solid var(--jurassic-gold);
+            color: var(--jurassic-gold);
+            font-size: 1.6em;
+        }
+
+        .card-front {
+            background: #f4f4f4;
+            color: #111;
+            transform: rotateY(180deg);
+            border: 2px solid #fff;
+            font-size: 0.95em;
+        }
+
+        .card.matched .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        /* Comportamiento 1: Mantener boca arriba */
+        .card.matched .card-front {
+            background: #2a4d2c !important;
+            color: #fff !important;
+            border: 2px solid #5cb85c;
+            box-shadow: 0 0 8px #5cb85c;
+            cursor: default;
+        }
+
+        /* Comportamiento 2: Desaparecer por completo */
+        .card.matched.disappeared {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        /* Formateo de raíces y fracciones */
+        .sqrt {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .sqrt-symbol {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.15em;
+            margin-right: -1px;
+        }
+        .sqrt-vinculum {
+            border-top: 1.5px solid currentColor;
+            padding-top: 1px;
+            line-height: 0.9;
+        }
+
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            padding: 0 4px;
+            font-size: 0.95em;
+        }
+        .frac .num {
+            border-bottom: 1px solid currentColor;
+            padding-bottom: 1px;
+        }
+        .frac .den {
+            padding-top: 1px;
+        }
+
+        /* PANTALLA 3 */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .stats-table th, .stats-table td {
+            padding: 12px;
+            border: 1px solid var(--jurassic-gold);
+            text-align: left;
+        }
+
+        .stats-table th {
+            background-color: var(--jurassic-green);
+            color: var(--jurassic-gold);
+        }
+
+        .winner-box {
+            text-align: center;
+            background: rgba(243, 156, 18, 0.2);
+            border: 3px dashed var(--jurassic-gold);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .winner-name {
+            font-size: 2em;
+            color: #fff;
+            text-shadow: 0 0 10px var(--jurassic-gold);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screen-setup" class="screen active">
+        <h1>🦖 JURASSIC TRIGO-MEMORY 🦕</h1>
+        <h3>Panel de Control de Seguridad de la Isla</h3>
+        
+        <div class="image-container" style="max-width: 400px;">
+            <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
+            <div class="image-placeholder"><img src="./resources/imagen_introductoria.png" alt="Repaso de trigonometría"></div>
+        </div>
+
+        <div class="rules-box">
+            <h4>📜 REGLAS DEL PERÍMETRO:</h4>
+            <ul>
+                <li>Consolida los accesos emparejando celdas con valores trigonométricos idénticos.</li>
+                <li><strong>Matriz de Contención Ajustada:</strong> El tablero tiene exactamente una cuadrícula de 7 columnas por 6 filas (42 tarjetas totales).</li>
+                <li>El barajado es completamente aleatorio cada vez que el protocolo se inicializa.</li>
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label for="input-num-teams">Número de Equipos de Respuesta (1 - 6):</label>
+            <input type="number" id="input-num-teams" min="1" max="6" value="2" onchange="generateTeamFields()">
+        </div>
+
+        <div class="form-group">
+            <label>Nombres de los Equipos:</label>
+            <div id="team-fields-container" class="team-input-list"></div>
+        </div>
+
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label for="input-global-time">Tiempo Máx. Partida (segundos):</label>
+                <input type="number" id="input-global-time" value="300" min="30">
+            </div>
+            <div>
+                <label for="input-turn-time">Tiempo por Turno (segundos):</label>
+                <input type="number" id="input-turn-time" value="15" min="5">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="select-match-behavior">Comportamiento de Celdas Acertadas:</label>
+            <select id="select-match-behavior">
+                <option value="keep">Tarjetas desveladas emparejadas se mantienen boca arriba</option>
+                <option value="fade">Tarjetas desveladas emparejadas desaparecen</option>
+            </select>
+        </div>
+
+        <button onclick="startGame()">▶️ INICIAR PROTOCOLO DE SEGURIDAD</button>
+	<br>
+        <hr>
+        <p>Autor: Joaquín Candañedo.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="./resources/CC_BY_SA.png" alt="Creative Commons Reconocimiento - Compartir Igual"></a></p>  
+
+    </div>
+
+
+    <div id="screen-game" class="screen">
+        <h2>SISTEMA DE CONTENCIÓN ACTIVO</h2>
+        
+        <div class="console-top-panel">
+            <div class="console-row-hud">
+                <div class="hud-panel">
+                    <div class="hud-title-lbl">ENERGÍA GLOBAL ISLA</div>
+                    <div id="hud-global-timer" class="hud-time">00:00</div>
+                </div>
+
+                <div class="turn-banner">
+                    <div class="hud-title-lbl" style="color:#fff; font-weight:bold; margin-bottom:2px;">CONSOLA EN USO POR:</div>
+                    <span id="hud-active-team" class="active-team-name">Cargando...</span>
+                </div>
+                
+                <div class="hud-panel">
+                    <div class="hud-title-lbl">REACCIÓN TURNO</div>
+                    <div id="hud-turn-timer" class="hud-time">00</div>
+                </div>
+            </div>
+
+            <div class="image-container" style="max-width: 320px; padding: 5px; border-style: dotted;">
+                <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
+                <div class="image-placeholder"><img src="./resources/imagen_mapa_sector_electrico.png" alt="Imagen controlando el perímetro eléctrico del parque"></div>
+            </div>
+
+            <div id="teams-status" class="teams-status-horizontal"></div>
+        </div>
+
+        <div id="memory-grid" class="memory-grid-7x6"></div>
+    </div>
+
+
+    <div id="screen-results" class="screen">
+        <h2>INFORME DE CONTROL DE DAÑOS</h2>
+        
+        <div class="image-container" style="max-width: 450px;">
+            <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
+            <div class="image-placeholder"><img src="./resources/imagen_reparto_medallas.png" alt="Imagen de reparto de medallas"></div>
+        </div>
+
+        <div class="winner-box">
+            <h3>🏆 EQUIPO SUPERVIVIENTE / GANADOR 🏆</h3>
+            <div id="winner-display" class="winner-name">Nadie</div>
+        </div>
+
+        <h3>Estadísticas de la Misión</h3>
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>Equipo</th>
+                    <th>Aciertos (Parejas)</th>
+                    <th>Estado de Supervivencia</th>
+                </tr>
+            </thead>
+            <tbody id="stats-tbody"></tbody>
+        </table>
+
+        <button onclick="resetToSetup()">🔄 REINICIAR PROTOCOLO (VOLVER A EMPEZAR)</button>
+    </div>
+
+
+    <script>
+        const html_1_2 = '<div class="frac"><span class="num">1</span><span class="den">2</span></div>';
+        const html_sqrt2_2 = '<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">2</span></span></span><span class="den">2</span></div>';
+        const html_sqrt3_2 = '<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
+        const html_neg_sqrt3_2 = '-<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
+
+        // Banco exacto de 42 tarjetas (21 parejas)
+        const trigoBank = [
+            { text: "sen(30°)", value: 0.5 }, { text: html_1_2, value: 0.5 },
+            { text: "cos(60°)", value: 0.5 }, { text: html_1_2, value: 0.5 },
+            { text: "sen(90°)", value: 1.0 }, { text: "1", value: 1.0 },
+            { text: "cos(0°)", value: 1.0 }, { text: "1", value: 1.0 },
+            { text: "tan(45°)", value: 1.0 }, { text: "1", value: 1.0 },
+            { text: "sen²(x) + cos²(x)", value: 1.0 }, { text: "1", value: 1.0 },
+            { text: "Teorema de Pitágoras", value: "pitagoras" }, { text: "a² + b² = c²", value: "pitagoras" },
+            { text: "sen(-x)", value: "neg_sen" }, { text: "-sen(x)", value: "neg_sen" },
+            { text: "cos(-x)", value: "cos_x" }, { text: "cos(x)", value: "cos_x" },
+            { text: "sen(90° - x)", value: "cos_x" }, { text: "cos(x)", value: "cos_x" },
+            { text: "cos(90° - x)", value: "sen_x" }, { text: "sen(x)", value: "sen_x" },
+            { text: "sen(180° - x)", value: "sen_x" }, { text: "sen(x)", value: "sen_x" },
+            { text: "cos(180° - x)", value: "neg_cos" }, { text: "-cos(x)", value: "neg_cos" },
+            { text: "sen(45°)", value: 0.7071 }, { text: html_sqrt2_2, value: 0.7071 },
+            { text: "cos(45°)", value: 0.7071 }, { text: html_sqrt2_2, value: 0.7071 },
+            { text: "cos(30°)", value: 0.866 }, { text: html_sqrt3_2, value: 0.866 },
+            { text: "sen(60°)", value: 0.866 }, { text: html_sqrt3_2, value: 0.866 },
+            { text: "cos(120°)", value: -0.5 }, { text: "-1/2", value: -0.5 },
+            { text: "cos(150°)", value: -0.866 }, { text: html_neg_sqrt3_2, value: -0.866 },
+            { text: "tan(0°)", value: 0.0 }, { text: "0", value: 0.0 },
+            { text: "sen(180°)", value: 0.0 }, { text: "0", value: 0.0 }
+        ];
+
+        const teamColors = ["#2a4d69", "#4b86b4", "#adcbe3", "#e74c3c", "#8e44ad", "#16a085"];
+
+        let teams = [];
+        let currentTeamIndex = 0;
+        let globalTimeMax = 300;
+        let turnTimeMax = 15;
+        let globalTimeRemaining = 0;
+        let turnTimeRemaining = 0;
+        let globalInterval = null;
+        let turnInterval = null;
+        let cardsData = [];
+        let flippedCards = [];
+        let lockBoard = false;
+        let matchBehavior = "keep"; // Almacena la preferencia del desplegable
+
+        window.onload = function() {
+            generateTeamFields();
+        };
+
+        function generateTeamFields() {
+            const numTeams = parseInt(document.getElementById('input-num-teams').value) || 2;
+            const container = document.getElementById('team-fields-container');
+            container.innerHTML = '';
+            for(let i = 0; i < numTeams; i++) {
+                const div = document.createElement('div');
+                div.style.marginBottom = "5px";
+                div.innerHTML = `<input type="text" id="team-name-${i}" value="Equipo ${i+1}" style="border-left: 5px solid ${teamColors[i % teamColors.length]}">`;
+                container.appendChild(div);
+            }
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            const numTeams = parseInt(document.getElementById('input-num-teams').value) || 2;
+            teams = [];
+            for(let i = 0; i < numTeams; i++) {
+                const nameInput = document.getElementById(`team-name-${i}`);
+                teams.push({
+                    name: nameInput ? nameInput.value : `Equipo ${i+1}`,
+                    score: 0,
+                    color: teamColors[i % teamColors.length]
+                });
+            }
+
+            globalTimeMax = parseInt(document.getElementById('input-global-time').value) || 300;
+            turnTimeMax = parseInt(document.getElementById('input-turn-time').value) || 15;
+            globalTimeRemaining = globalTimeMax;
+            turnTimeRemaining = turnTimeMax;
+            currentTeamIndex = 0;
+            flippedCards = [];
+            lockBoard = false;
+
+            // Guardar configuración del desplegable de comportamiento
+            matchBehavior = document.getElementById('select-match-behavior').value;
+
+            // Barajado
+            cardsData = JSON.parse(JSON.stringify(trigoBank));
+            cardsData.sort(() => Math.random() - 0.5);
+
+            renderGrid();
+            renderTeamStatus();
+            updateBackgroundAndTurn();
+            startTimers();
+            switchScreen('screen-game');
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            cardsData.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('card');
+                cardEl.dataset.index = index;
+                cardEl.dataset.value = card.value;
+
+                cardEl.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">${card.text}</div>
+                        <div class="card-back">🦖</div>
+                    </div>
+                `;
+                cardEl.addEventListener('click', flipCard);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function renderTeamStatus() {
+            const container = document.getElementById('teams-status');
+            container.innerHTML = '';
+            teams.forEach((team, index) => {
+                const badge = document.createElement('div');
+                badge.classList.add('team-badge');
+                badge.id = `badge-${index}`;
+                badge.style.backgroundColor = team.color;
+                badge.innerHTML = `<strong>${team.name}</strong><div id="score-${index}">Aciertos: 0</div>`;
+                container.appendChild(badge);
+            });
+        }
+
+        function updateBackgroundAndTurn() {
+            const activeTeam = teams[currentTeamIndex];
+            const bannerName = document.getElementById('hud-active-team');
+            bannerName.innerText = activeTeam.name;
+            bannerName.style.color = activeTeam.color;
+
+            document.querySelectorAll('.team-badge').forEach((b, i) => {
+                if(i === currentTeamIndex) b.classList.add('active-turn');
+                else b.classList.remove('active-turn');
+            });
+
+            document.body.style.backgroundColor = `${activeTeam.color}25`;
+        }
+
+        function startTimers() {
+            clearInterval(globalInterval);
+            clearInterval(turnInterval);
+
+            globalInterval = setInterval(() => {
+                globalTimeRemaining--;
+                let mins = Math.floor(globalTimeRemaining / 60);
+                let secs = globalTimeRemaining % 60;
+                document.getElementById('hud-global-timer').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+                if(globalTimeRemaining <= 0) endGame();
+            }, 1000);
+
+            resetTurnTimer();
+        }
+
+        function resetTurnTimer() {
+            clearInterval(turnInterval);
+            turnTimeRemaining = turnTimeMax;
+            document.getElementById('hud-turn-timer').innerText = turnTimeRemaining;
+
+            turnInterval = setInterval(() => {
+                turnTimeRemaining--;
+                document.getElementById('hud-turn-timer').innerText = turnTimeRemaining;
+                if(turnTimeRemaining <= 0) nextTurn();
+            }, 1000);
+        }
+
+        function nextTurn() {
+            flippedCards.forEach(card => card.classList.remove('flipped'));
+            flippedCards = [];
+            lockBoard = false;
+            currentTeamIndex = (currentTeamIndex + 1) % teams.length;
+            updateBackgroundAndTurn();
+            resetTurnTimer();
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            lockBoard = true;
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.value === card2.dataset.value && card1.dataset.index !== card2.dataset.index) {
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    
+                    // Aplicar dinámicamente la opción seleccionada si es desvanecer (fade)
+                    if (matchBehavior === "fade") {
+                        card1.classList.add('disappeared');
+                        card2.classList.add('disappeared');
+                    }
+                    
+                    teams[currentTeamIndex].score++;
+                    document.getElementById(`score-${currentTeamIndex}`).innerText = `Aciertos: ${teams[currentTeamIndex].score}`;
+
+                    flippedCards = [];
+                    lockBoard = false;
+
+                    const totalMatched = document.querySelectorAll('.card.matched').length;
+                    if(totalMatched === cardsData.length) {
+                        endGame();
+                    } else {
+                        resetTurnTimer();
+                    }
+                }, 400);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    nextTurn();
+                }, 1200);
+            }
+        }
+
+        function endGame() {
+            clearInterval(globalInterval);
+            clearInterval(turnInterval);
+            document.body.style.backgroundColor = "#111a12";
+
+            let maxScore = -1;
+            let winners = [];
+
+            teams.forEach(team => {
+                if(team.score > maxScore) maxScore = team.score;
+            });
+
+            teams.forEach(team => {
+                if(team.score === maxScore && maxScore > 0) winners.push(team.name);
+            });
+
+            let winnerName = winners.length === 1 ? `¡${winners[0]} ha evacuado con éxito!` : 
+                             winners.length > 1 ? `¡Empate Técnico entre: ${winners.join(', ')}!` : 
+                             "¡Los Dinosaurios han ganado! (Nadie acertó)";
+
+            document.getElementById('winner-display').innerText = winnerName;
+
+            const tbody = document.getElementById('stats-tbody');
+            tbody.innerHTML = '';
+            teams.forEach(team => {
+                const tr = document.createElement('tr');
+                const esGanador = team.score === maxScore && maxScore > 0;
+                tr.innerHTML = `
+                    <td style="color:${team.color}; font-weight:bold;">${team.name}</td>
+                    <td>${team.score} parejas</td>
+                    <td>${esGanador ? '🟢 A salvo (Líder)' : '🔴 Devorado en los Sectores'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            switchScreen('screen-results');
+        }
+
+        function resetToSetup() {
+            switchScreen('screen-setup');
+        }
+    </script>
+</body>
+</html>

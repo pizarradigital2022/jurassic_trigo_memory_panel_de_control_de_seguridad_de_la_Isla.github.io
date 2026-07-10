@@ -17,7 +17,14 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--jurassic-dark);
+            /* CAMBIO: Se configura la imagen el_fondo_jp.png con un gradiente oscuro para legibilidad */
+            background-image: 
+                radial-gradient(circle, rgba(17, 26, 18, 0.4) 0%, rgba(17, 26, 18, 0.85) 100%),
+                url("resources/el_fondo_jp.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Mantiene el fondo fijo al hacer scroll */
             color: var(--light-text);
             margin: 0;
             padding: 20px;
@@ -500,7 +507,6 @@
         const html_sqrt3_2 = '<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
         const html_neg_sqrt3_2 = '-<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
 
-        // Clasificación explícita de tipos ("expresion" vs "numero") para obligar a emparejamientos cruzados válidos
         const trigoBank = [
             { text: "sen(30°)", value: "0.5", type: "expresion" }, 
             { text: html_1_2, value: "0.5", type: "numero" },
@@ -633,7 +639,7 @@
                 cardEl.classList.add('card');
                 cardEl.dataset.index = index;
                 cardEl.dataset.value = card.value;
-                cardEl.dataset.type = card.type; // Guardamos el tipo de tarjeta (expresion o numero)
+                cardEl.dataset.type = card.type;
 
                 cardEl.innerHTML = `
                     <div class="card-inner">
@@ -725,7 +731,6 @@
             lockBoard = true;
             const [card1, card2] = flippedCards;
 
-            // VALIDACIÓN: Deben tener el mismo valor matemático Y tipos diferentes (expresión + número)
             if (card1.dataset.value === card2.dataset.value && 
                 card1.dataset.type !== card2.dataset.type && 
                 card1.dataset.index !== card2.dataset.index) {

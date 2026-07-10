@@ -28,7 +28,6 @@
             transition: background 0.5s ease;
         }
 
-        /* Contenedor adaptativo de imágenes */
         .image-container {
             width: 100%;
             margin: 10px auto;
@@ -57,7 +56,6 @@
             font-size: 0.9em;
         }
 
-        /* Estilos de Contenedores y Pantallas */
         .screen {
             display: none;
             width: 100%;
@@ -83,7 +81,6 @@
             text-shadow: 2px 2px 4px #000;
         }
 
-        /* Formularios y Botones */
         .form-group {
             margin-bottom: 15px;
         }
@@ -148,7 +145,6 @@
             border-radius: 5px;
         }
 
-        /* ================= CONSOLA SUPERIOR DE ACCESO ================= */
         .console-top-panel {
             display: flex;
             flex-direction: column;
@@ -241,7 +237,6 @@
             opacity: 1;
         }
 
-        /* ================= REJILLA PERFECTA: 7 COLUMNAS X 6 FILAS (42 CELDAS) ================= */
         .memory-grid-7x6 {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -305,7 +300,6 @@
             transform: rotateY(180deg);
         }
         
-        /* Comportamiento 1: Mantener boca arriba */
         .card.matched .card-front {
             background: #2a4d2c !important;
             color: #fff !important;
@@ -314,7 +308,6 @@
             cursor: default;
         }
 
-        /* Comportamiento 2: Desaparecer por completo */
         .card.matched.disappeared {
             opacity: 0;
             visibility: hidden;
@@ -322,7 +315,6 @@
             cursor: default;
         }
 
-        /* Formateo de raíces y fracciones */
         .sqrt {
             display: inline-flex;
             align-items: center;
@@ -355,7 +347,6 @@
             padding-top: 1px;
         }
 
-        /* PANTALLA 3 */
         .stats-table {
             width: 100%;
             border-collapse: collapse;
@@ -398,16 +389,15 @@
         <h3>Panel de Control de Seguridad de la Isla</h3>
         
         <div class="image-container" style="max-width: 400px;">
-            <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
             <div class="image-placeholder"><img src="./resources/imagen_introductoria.png" alt="Repaso de trigonometría"></div>
         </div>
 
         <div class="rules-box">
             <h4>📜 REGLAS DEL PERÍMETRO:</h4>
             <ul>
-                <li>Consolida los accesos emparejando celdas con valores trigonométricos idénticos.</li>
-                <li><strong>Matriz de Contención Ajustada:</strong> El tablero tiene exactamente una cuadrícula de 7 columnas por 6 filas (42 tarjetas totales).</li>
-                <li>El barajado es completamente aleatorio cada vez que el protocolo se inicializa.</li>
+                <li>Consolida los accesos emparejando una expresión trigonométrica con su valor numérico correspondiente.</li>
+                <li><strong>Regla Estricta:</strong> No se permite emparejar dos números puros entre sí, ni dos expresiones idénticas directas. ¡Debes resolver la trigonometría!</li>
+                <li>El tablero tiene exactamente una cuadrícula de 7 columnas por 6 filas (42 tarjetas totales).</li>
             </ul>
         </div>
 
@@ -441,12 +431,10 @@
         </div>
 
         <button onclick="startGame()">▶️ INICIAR PROTOCOLO DE SEGURIDAD</button>
-	<br>
+        <br>
         <hr>
         <p>Autor: Joaquín Candañedo.<br><a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="./resources/CC_BY_SA.png" alt="Creative Commons Reconocimiento - Compartir Igual"></a></p>  
-
     </div>
-
 
     <div id="screen-game" class="screen">
         <h2>SISTEMA DE CONTENCIÓN ACTIVO</h2>
@@ -470,7 +458,6 @@
             </div>
 
             <div class="image-container" style="max-width: 320px; padding: 5px; border-style: dotted;">
-                <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
                 <div class="image-placeholder"><img src="./resources/imagen_mapa_sector_electrico.png" alt="Imagen controlando el perímetro eléctrico del parque"></div>
             </div>
 
@@ -480,12 +467,10 @@
         <div id="memory-grid" class="memory-grid-7x6"></div>
     </div>
 
-
     <div id="screen-results" class="screen">
         <h2>INFORME DE CONTROL DE DAÑOS</h2>
         
         <div class="image-container" style="max-width: 450px;">
-            <img src="" alt="" onerror="this.style.display='none'; this.parentElement.querySelector('.image-placeholder').style.display='block';">
             <div class="image-placeholder"><img src="./resources/imagen_reparto_medallas.png" alt="Imagen de reparto de medallas"></div>
         </div>
 
@@ -509,36 +494,67 @@
         <button onclick="resetToSetup()">🔄 REINICIAR PROTOCOLO (VOLVER A EMPEZAR)</button>
     </div>
 
-
     <script>
         const html_1_2 = '<div class="frac"><span class="num">1</span><span class="den">2</span></div>';
         const html_sqrt2_2 = '<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">2</span></span></span><span class="den">2</span></div>';
         const html_sqrt3_2 = '<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
         const html_neg_sqrt3_2 = '-<div class="frac"><span class="num"><span class="sqrt"><span class="sqrt-symbol">&radic;</span><span class="sqrt-vinculum">3</span></span></span><span class="den">2</span></div>';
 
-        // Banco exacto de 42 tarjetas (21 parejas)
+        // Clasificación explícita de tipos ("expresion" vs "numero") para obligar a emparejamientos cruzados válidos
         const trigoBank = [
-            { text: "sen(30°)", value: 0.5 }, { text: html_1_2, value: 0.5 },
-            { text: "cos(60°)", value: 0.5 }, { text: html_1_2, value: 0.5 },
-            { text: "sen(90°)", value: 1.0 }, { text: "1", value: 1.0 },
-            { text: "cos(0°)", value: 1.0 }, { text: "1", value: 1.0 },
-            { text: "tan(45°)", value: 1.0 }, { text: "1", value: 1.0 },
-            { text: "sen²(x) + cos²(x)", value: 1.0 }, { text: "1", value: 1.0 },
-            { text: "Teorema de Pitágoras", value: "pitagoras" }, { text: "a² + b² = c²", value: "pitagoras" },
-            { text: "sen(-x)", value: "neg_sen" }, { text: "-sen(x)", value: "neg_sen" },
-            { text: "cos(-x)", value: "cos_x" }, { text: "cos(x)", value: "cos_x" },
-            { text: "sen(90° - x)", value: "cos_x" }, { text: "cos(x)", value: "cos_x" },
-            { text: "cos(90° - x)", value: "sen_x" }, { text: "sen(x)", value: "sen_x" },
-            { text: "sen(180° - x)", value: "sen_x" }, { text: "sen(x)", value: "sen_x" },
-            { text: "cos(180° - x)", value: "neg_cos" }, { text: "-cos(x)", value: "neg_cos" },
-            { text: "sen(45°)", value: 0.7071 }, { text: html_sqrt2_2, value: 0.7071 },
-            { text: "cos(45°)", value: 0.7071 }, { text: html_sqrt2_2, value: 0.7071 },
-            { text: "cos(30°)", value: 0.866 }, { text: html_sqrt3_2, value: 0.866 },
-            { text: "sen(60°)", value: 0.866 }, { text: html_sqrt3_2, value: 0.866 },
-            { text: "cos(120°)", value: -0.5 }, { text: "-1/2", value: -0.5 },
-            { text: "cos(150°)", value: -0.866 }, { text: html_neg_sqrt3_2, value: -0.866 },
-            { text: "tan(0°)", value: 0.0 }, { text: "0", value: 0.0 },
-            { text: "sen(180°)", value: 0.0 }, { text: "0", value: 0.0 }
+            { text: "sen(30°)", value: "0.5", type: "expresion" }, 
+            { text: html_1_2, value: "0.5", type: "numero" },
+            { text: "cos(60°)", value: "0.5", type: "expresion" }, 
+            { text: html_1_2, value: "0.5", type: "numero" },
+            
+            { text: "sen(90°)", value: "1", type: "expresion" }, 
+            { text: "1", value: "1", type: "numero" },
+            { text: "cos(0°)", value: "1", type: "expresion" }, 
+            { text: "1", value: "1", type: "numero" },
+            { text: "tan(45°)", value: "1", type: "expresion" }, 
+            { text: "1", value: "1", type: "numero" },
+            { text: "sen²(x) + cos²(x)", value: "1", type: "expresion" }, 
+            { text: "1", value: "1", type: "numero" },
+            
+            { text: "Teorema de Pitágoras", value: "pitagoras", type: "expresion" }, 
+            { text: "a² + b² = c²", value: "pitagoras", type: "numero" },
+            
+            { text: "sen(-x)", value: "neg_sen", type: "expresion" }, 
+            { text: "-sen(x)", value: "neg_sen", type: "numero" },
+            
+            { text: "cos(-x)", value: "cos_x", type: "expresion" }, 
+            { text: "cos(x)", value: "cos_x", type: "numero" },
+            { text: "sen(90° - x)", value: "cos_x", type: "expresion" }, 
+            { text: "cos(x)", value: "cos_x", type: "numero" },
+            
+            { text: "cos(90° - x)", value: "sen_x", type: "expresion" }, 
+            { text: "sen(x)", value: "sen_x", type: "numero" },
+            { text: "sen(180° - x)", value: "sen_x", type: "expresion" }, 
+            { text: "sen(x)", value: "sen_x", type: "numero" },
+            
+            { text: "cos(180° - x)", value: "neg_cos", type: "expresion" }, 
+            { text: "-cos(x)", value: "neg_cos", type: "numero" },
+            
+            { text: "sen(45°)", value: "0.7071", type: "expresion" }, 
+            { text: html_sqrt2_2, value: "0.7071", type: "numero" },
+            { text: "cos(45°)", value: "0.7071", type: "expresion" }, 
+            { text: html_sqrt2_2, value: "0.7071", type: "numero" },
+            
+            { text: "cos(30°)", value: "0.866", type: "expresion" }, 
+            { text: html_sqrt3_2, value: "0.866", type: "numero" },
+            { text: "sen(60°)", value: "0.866", type: "expresion" }, 
+            { text: html_sqrt3_2, value: "0.866", type: "numero" },
+            
+            { text: "cos(120°)", value: "-0.5", type: "expresion" }, 
+            { text: "-1/2", value: "-0.5", type: "numero" },
+            
+            { text: "cos(150°)", value: "-0.866", type: "expresion" }, 
+            { text: html_neg_sqrt3_2, value: "-0.866", type: "numero" },
+            
+            { text: "tan(0°)", value: "0", type: "expresion" }, 
+            { text: "0", value: "0", type: "numero" },
+            { text: "sen(180°)", value: "0", type: "expresion" }, 
+            { text: "0", value: "0", type: "numero" }
         ];
 
         const teamColors = ["#2a4d69", "#4b86b4", "#adcbe3", "#e74c3c", "#8e44ad", "#16a085"];
@@ -554,7 +570,7 @@
         let cardsData = [];
         let flippedCards = [];
         let lockBoard = false;
-        let matchBehavior = "keep"; // Almacena la preferencia del desplegable
+        let matchBehavior = "keep";
 
         window.onload = function() {
             generateTeamFields();
@@ -597,10 +613,8 @@
             flippedCards = [];
             lockBoard = false;
 
-            // Guardar configuración del desplegable de comportamiento
             matchBehavior = document.getElementById('select-match-behavior').value;
 
-            // Barajado
             cardsData = JSON.parse(JSON.stringify(trigoBank));
             cardsData.sort(() => Math.random() - 0.5);
 
@@ -619,6 +633,7 @@
                 cardEl.classList.add('card');
                 cardEl.dataset.index = index;
                 cardEl.dataset.value = card.value;
+                cardEl.dataset.type = card.type; // Guardamos el tipo de tarjeta (expresion o numero)
 
                 cardEl.innerHTML = `
                     <div class="card-inner">
@@ -710,12 +725,15 @@
             lockBoard = true;
             const [card1, card2] = flippedCards;
 
-            if (card1.dataset.value === card2.dataset.value && card1.dataset.index !== card2.dataset.index) {
+            // VALIDACIÓN: Deben tener el mismo valor matemático Y tipos diferentes (expresión + número)
+            if (card1.dataset.value === card2.dataset.value && 
+                card1.dataset.type !== card2.dataset.type && 
+                card1.dataset.index !== card2.dataset.index) {
+                
                 setTimeout(() => {
                     card1.classList.add('matched');
                     card2.classList.add('matched');
                     
-                    // Aplicar dinámicamente la opción seleccionada si es desvanecer (fade)
                     if (matchBehavior === "fade") {
                         card1.classList.add('disappeared');
                         card2.classList.add('disappeared');
